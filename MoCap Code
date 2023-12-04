@@ -1,0 +1,32 @@
+%% BMEN E3810: Biomedical Engineering Laboratory I (Motion Capture)
+%  Written by: Dr . Lauren N . Heckelman
+%  Fall 2023
+
+%% Initialize the Workspace:
+clear; clc; close all;
+
+%% Load Video:
+vidObj = VideoReader('MoCap7.mov'); % Be sure to set the proper filename!
+
+allFrames = read(vidObj);
+FrameRate = vidObj . FrameRate; % Frames acquired per second
+
+    flexionAngles = zeros(1,size(allFrames, 4));
+    RedCentroids = zeros(2,size(allFrames, 4));
+    YellowCentroids = zeros(2,size(allFrames, 4));
+    BlueCentroids = zeros(2,size(allFrames, 4));
+
+    Blue = Frame1(:,:,1)>30 & Frame1(:,:,1)<60 & Frame1(:,:,2)<135 & Frame1(:,:,2)>95 & Frame1(:,:,3)<190 &Frame1(:,:,3)>140;
+    Yellow = Frame1(:,:,1)>200 & Frame1(:,:,1)<250 & Frame1(:,:,2)<200 & Frame1(:,:,2)>170 & Frame1(:,:,3)<2 & Frame1(:,:,3)>0;
+    Red = Frame1(:,:,1)>158 & Frame1(:,:,2)<2 & Frame1(:,:,3)<31 & Frame1(:,:,3)>27;
+    
+    
+    figure;
+    imshow(Red);
+
+% View first frame of your video:
+for n = 1:size(allFrames, 4)
+    Frame1 = allFrames(:,:,:,n);
+        Frame1 = allFrames(:,:,:,1);
+        figure; clf;
+        imshow(Frame1);
