@@ -16,17 +16,124 @@ FrameRate = vidObj . FrameRate; % Frames acquired per second
     YellowCentroids = zeros(2,size(allFrames, 4));
     BlueCentroids = zeros(2,size(allFrames, 4));
 
-    Blue = Frame1(:,:,1)>30 & Frame1(:,:,1)<60 & Frame1(:,:,2)<135 & Frame1(:,:,2)>95 & Frame1(:,:,3)<190 &Frame1(:,:,3)>140;
-    Yellow = Frame1(:,:,1)>200 & Frame1(:,:,1)<250 & Frame1(:,:,2)<200 & Frame1(:,:,2)>170 & Frame1(:,:,3)<2 & Frame1(:,:,3)>0;
-    Red = Frame1(:,:,1)>158 & Frame1(:,:,2)<2 & Frame1(:,:,3)<31 & Frame1(:,:,3)>27;
+   % Blue = Frame1(:,:,1)>30 & Frame1(:,:,1)<60 & Frame1(:,:,2)<135 & Frame1(:,:,2)>95 & Frame1(:,:,3)<190 &Frame1(:,:,3)>140;
+    % Yellow = Frame1(:,:,1)>200 & Frame1(:,:,1)<250 & Frame1(:,:,2)<200 & Frame1(:,:,2)>170 & Frame1(:,:,3)<2 & Frame1(:,:,3)>0;
+    % Red = Frame1(:,:,1)>158 & Frame1(:,:,2)<2 & Frame1(:,:,3)<31 & Frame1(:,:,3)>27;
     
     
-    figure;
-    imshow(Red);
+    
 
 % View first frame of your video:
 for n = 1:size(allFrames, 4)
-    Frame1 = allFrames(:,:,:,n);
+    %Frame1 = allFrames(:,:,:,n); %do we need this line?
         Frame1 = allFrames(:,:,:,1);
-        figure; clf;
-        imshow(Frame1);
+        % figure; clf;
+        % imshow(Frame1);
+
+        Blue = Frame1(:,:,1)>30 & Frame1(:,:,1)<60 & Frame1(:,:,2)<135 & Frame1(:,:,2)>95 & Frame1(:,:,3)<190 &Frame1(:,:,3)>140;
+        Yellow = Frame1(:,:,1)>200 & Frame1(:,:,1)<250 & Frame1(:,:,2)<200 & Frame1(:,:,2)>170 & Frame1(:,:,3)<2 & Frame1(:,:,3)>0;
+        Red = Frame1(:,:,1)>158 & Frame1(:,:,2)<2 & Frame1(:,:,3)<31 & Frame1(:,:,3)>27;
+       
+        [BlueCentroids(1,n), BlueCentroids(2,n)] = findCentroid(Blue);
+        % BlueCentroids(1,n) %x values
+        % BlueCentroids(2,n) %y values
+        %centroid_blue = [centroidX_blue, centroidY_blue];
+        
+        [YellowCentroids(1,n), YellowCentroids(2,n)] = findCentroid(Yellow);
+        %centroid_yellow = [centroidX_yellow, centroidY_yellow];
+        
+        [RedCentroids(1,n), RedCentroids(2,n)] = findCentroid(Red);
+        %centroid_red = [centroidX_red, centroidY_red];
+
+    
+        CentroidsX = [BlueCentroids(1,n),YellowCentroids(1,n),RedCentroids(1,n)];
+        CentroidsY = [BlueCentroids(2,n),YellowCentroids(2,n),RedCentroids(2,n)];
+
+        % a = centroid_blue - centroid_yellow;
+        % b = centroid_red - centroid_yellow;
+        % flexionangle = acosd(dot(a,b)/(norm(a)*norm(b)));
+        % % n = n+1
+        % allframeangles = [flexionangle]
+
+        flexionAngles(1,n)=calculateFlexionAngle(CentroidsX, CentroidsY); %do for other centroids too?
+        % flexionAngles(2,n)=calculateFlexionAngle(YellowCentroids(1,n), YellowCentroids(2,n));
+        % flexionAngles(3,n)=calculateFlexionAngle(BlueCentroids(1,n), BlueCentroids(2,n)); %2 has to be the middle marker from our video
+
+
+end 
+
+
+%% Data Analysis:
+    % 1. Set appropriate thresholds to identify color markers here
+    %[R G B]
+    %Blue - [30-60 95-135 140-190]
+    %Yellow - [200-250 170-200 0-2]
+    %Red - [158-160 0-2 27-31]
+    %saveas(figure(1), "bin_image.jpeg");
+
+
+    
+    
+    
+   
+    
+    % 2. Locate Centroids of Markers:
+     % [centroidX_blue, centroidY_blue] = findCentroid(Blue)
+     % centroid_blue = [centroidX_blue, centroidY_blue]
+     
+     % [centroidX_yellow, centroidY_yellow] = findCentroid(Yellow)
+     % centroid_yellow = [centroidX_yellow, centroidY_yellow]
+
+     % [centroidX_red, centroidY_red] = findCentroid(Red)
+     % centroid_red = [centroidX_red, centroidY_red]
+
+   
+  
+ 
+        
+    % 3. Calculate Flexion Angle:
+    % a = centroid_blue - centroid_yellow;
+    % b = centroid_red - centroid_yellow;
+    % flexionangle = acosd(dot(a,b)/(norm(a)*norm(b)));
+    
+
+
+       
+%% Data Visualization
+    % 1. Plot Centroid Locations Throughout Motion
+    plot(BlueCentroids(1,n), BlueCentroids(2,n));
+    hold on
+    plot(YellowCentroids(1,n), YellowCentroids(2,n));
+    plot(RedCentroids(1,n), RedCentroids(2,n));
+    hold off
+
+    
+% 2. Plot Flexion Angle vs . Time
+    % time = FrameRate
+    % plot(time, flexionAngles)
+
+%% Helper Functions:
+
+function [centroidX, centroidY] = findCentroid(IM_bw)
+    % Note: IM_bw must be a 2D binary image
+   
+    mask = sum(IM_bw(:)); %mask/background of image
+   
+    
+     
+    centroidX = sum(sum((1:size(IM_bw,2)).*IM_bw))/mask;
+    centroidY = sum(sum((1:size(IM_bw,1))'.*IM_bw))/mask;
+   
+
+end
+
+function flexionAngle = calculateFlexionAngle(centroidsX, centroidsY)
+    %make centroidsx and centroidsy matrices with red, yellow, blue
+    a = [centroidsX(1)-centroidsX(2), centroidsY(1)-centroidsY(2)];
+    b = [centroidsX(2)-centroidsX(3), centroidsY(2)-centroidsY(3)];
+    flexionAngle = acosd(dot(a,b)/(norm(a)*norm(b)));
+
+    % a = centroid_blue - centroid_yellow;
+    % b = centroid_red - centroid_yellow;
+    % angle = acosd(dot(a,b)/(norm(a)*norm(b)));
+end
