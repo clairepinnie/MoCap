@@ -26,7 +26,7 @@ FrameRate = vidObj . FrameRate; % Frames acquired per second
 % View first frame of your video:
 for n = 1:size(allFrames, 4)
     %Frame1 = allFrames(:,:,:,n); %do we need this line?
-        Frame1 = allFrames(:,:,:,1);
+        Frame1 = allFrames(:,:,:,n);
         % figure; clf;
         % imshow(Frame1);
 
@@ -58,6 +58,8 @@ for n = 1:size(allFrames, 4)
         flexionAngles(1,n)=calculateFlexionAngle(CentroidsX, CentroidsY); %do for other centroids too?
         % flexionAngles(2,n)=calculateFlexionAngle(YellowCentroids(1,n), YellowCentroids(2,n));
         % flexionAngles(3,n)=calculateFlexionAngle(BlueCentroids(1,n), BlueCentroids(2,n)); %2 has to be the middle marker from our video
+
+        timeallframes = [Frame1*(1/30.01)]
 
 
 end 
@@ -99,18 +101,24 @@ end
 
 
        
+
 %% Data Visualization
     % 1. Plot Centroid Locations Throughout Motion
-    plot(BlueCentroids(1,n), BlueCentroids(2,n));
+    figure(1);
+    plot(BlueCentroids(1,:), BlueCentroids(2,:), 'b.');
     hold on
-    plot(YellowCentroids(1,n), YellowCentroids(2,n));
-    plot(RedCentroids(1,n), RedCentroids(2,n));
+    plot(YellowCentroids(1,:), YellowCentroids(2,:));
+    plot(RedCentroids(1,:), RedCentroids(2,:));
     hold off
 
     
 % 2. Plot Flexion Angle vs . Time
     % time = FrameRate
-    % plot(time, flexionAngles)
+    %ex. frame rate = 30 frames per sec, then frame * 1/30 would give you
+    %time, save a time array based on all these values, plot this time
+    %versus the flexion angles 
+   
+    plot(timeallframes, flexionAngles)
 
 %% Helper Functions:
 
@@ -137,3 +145,4 @@ function flexionAngle = calculateFlexionAngle(centroidsX, centroidsY)
     % b = centroid_red - centroid_yellow;
     % angle = acosd(dot(a,b)/(norm(a)*norm(b)));
 end
+
