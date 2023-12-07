@@ -26,7 +26,7 @@ for n = 1:size(allFrames, 4)
         %figure; clf;
         %imshow(Frame1);
 
-        Blue = Frame1(:,:,1)>5 & Frame1(:,:,1)<15 & Frame1(:,:,2)<70 & Frame1(:,:,2)>65 & Frame1(:,:,3)<120 &Frame1(:,:,3)>100;
+        Blue = Frame1(:,:,1)>5 & Frame1(:,:,2)<70 & Frame1(:,:,2)>65 & Frame1(:,:,3)<120;
         Yellow = Frame1(:,:,1)>200 & Frame1(:,:,1)<230 & Frame1(:,:,2)<200 & Frame1(:,:,2)>165 & Frame1(:,:,3)<40 & Frame1(:,:,3)>30;
         Red = Frame1(:,:,1)>100 & Frame1(:,:,2)<40 & Frame1(:,:,3)<40;
        
@@ -47,7 +47,7 @@ for n = 1:size(allFrames, 4)
       
        
 
-        timeallframes = [Frame1*(1/30.01)];
+        timeallframes(n) = n/30.01;
 
 
 end 
@@ -73,9 +73,9 @@ end
     plot(RedCentroids(1,:), RedCentroids(2,:), 'r.');
     hold off
     axis equal
-    title("Position of X Centroid versus Position of Y Centroid")
-    xlabel("X Centroid Position")
-    ylabel("Y Centroid Position")
+    title("Position of Centroids")
+    xlabel("X Position of Centroids")
+    ylabel("Y Position of Centroids")
     set(gca, 'YDir','reverse')
 
     
@@ -86,6 +86,9 @@ end
     %versus the flexion angles 
    
     plot(timeallframes, flexionAngles)
+    title("Flexion Angle vs. Time")
+    xlabel("Time (s)")
+    ylabel("Flexion Angle (º)")
 
 %% Helper Functions:
 
@@ -112,3 +115,4 @@ function flexionAngle = calculateFlexionAngle(centroidsX, centroidsY)
     % b = centroid_red - centroid_yellow;
     % angle = acosd(dot(a,b)/(norm(a)*norm(b)));
 end
+
